@@ -19,7 +19,7 @@ gemini_model = dspy.LM(
 dspy.configure(lm=gemini_model)
 
 
-# --- [STEP 2: DEFINE SIGNATURES AND MODULE] ---
+# ---  DEFINE SIGNATURES AND MODULE] ---
 
 medical_fields = ["Cardiology", "Neurology", "Oncology", "Pediatrics", "Dermatology"]
 
@@ -39,8 +39,6 @@ class MedicalQASystem(dspy.Module):
             medical_field=category_prediction.medical_field,
         )
 
-
-# --- [STEP 4: COMPILE THE PROGRAM] ---
 # This step fine-tunes the prompts for your program.
 qa_program = MedicalQASystem()
 
@@ -48,13 +46,14 @@ teleprompter = BootstrapFewShot(metric=None, max_bootstrapped_demos=2, max_label
 optimized_qa_program = teleprompter.compile(student=qa_program, trainset=train_data)
 
 
-# --- [STEP 5: USE THE FINE-TUNED MODEL WITH A PDF] ---
+# ---  USE THE FINE-TUNED MODEL WITH A PDF ---
 
-# 1. Define PDF Path and your question
+#  Define PDF Path and your question
 pdf_file_path = "Testset\onco_test_1.pdf"  # Make sure this file exists in your folder!
 user_question = "What medication was prescribed to the patient?"
 
-# 2. Parse the PDF to get its text content
+
+# Parse the PDF to get its text content
 document_content = parse_pdf_text(pdf_file_path)
 
 if document_content:
