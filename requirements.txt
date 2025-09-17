@@ -3,4 +3,34 @@ python-dotenv
 pdfplumber 
 pypdf2
 dspy
-fitz
+PyMuPDF
+python-docx
+pandas
+openpyxl
+xlrd
+python-pptx
+odfpy
+pypandoc
+pytesseract
+
+
+
+
+
+
+
+# | Package             | Quick use                      |
+# | ------------------- | ------------------------------ |
+# | google-generativeai | Call Gemini AI                 |
+# | python-dotenv       | Load `.env` secrets            |
+# | pdfplumber          | Extract tables from PDFs       |
+# | PyPDF2              | Merge/split PDFs               |
+# | dspy-ai             | Build/train LLM workflows      |
+# | PyMuPDF             | Fast PDF text/images           |
+# | python-docx         | Read Word docs                 |
+# | pandas              | Work with tabular data         |
+# | openpyxl            | Excel .xlsx support for pandas |
+# | xlrd                | Excel .xls support for pandas  |
+# | python-pptx         | Read PowerPoints               |
+# | odfpy               | Read OpenDocument files        |
+# | pypandoc            | Convert between formats        |
