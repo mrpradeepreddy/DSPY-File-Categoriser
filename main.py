@@ -41,7 +41,7 @@ class MedicalQASystem(dspy.Module):
 
 # This step fine-tunes the prompts for your program.
 qa_program = MedicalQASystem()
-def simple_accuracy(gold, pred):
+def simple_accuracy(gold, pred,trace=None):
     return 1.0 if gold.medical_field == pred.medical_field else 0.0
 teleprompter = BootstrapFewShot(metric=simple_accuracy, max_bootstrapped_demos=2, max_labeled_demos=2)
 optimized_qa_program = teleprompter.compile(student=qa_program, trainset=train_data)
