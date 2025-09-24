@@ -1,12 +1,32 @@
 import dspy
 from file_extract import parse_pdf_text
+import os
 
-train_data = [
-    dspy.Example(
-        document_text=parse_pdf_text("Trainset\SubI_CV_Ian_Miller_1007.pdf"),
-    ).with_inputs("document_text"),
-    dspy.Example(
-        document_text=parse_pdf_text("Trainset\SubI_CV_Byron_Beer_1005.pdf"),
-    ).with_inputs("document_text")
-    
+# List of your PDF paths
+pdf_paths = [
+    r"Trainset\SubI_CV_Ian_Miller_1007.pdf",
+    r"Trainset\SubI_CV_Byron_Beer_1005.pdf"
 ]
+
+# Build train_data with a loop
+train_data = []
+for path in pdf_paths:
+    text = parse_pdf_text(path)
+    example = dspy.Example(document_text=text).with_inputs("document_text")
+    train_data.append(example)
+
+
+
+
+# import dspy
+# from file_extract import parse_pdf_text
+
+# train_data = [
+#     dspy.Example(
+#         document_text=parse_pdf_text("Trainset\SubI_CV_Ian_Miller_1007.pdf"),
+#     ).with_inputs("document_text"),
+#     dspy.Example(
+#         document_text=parse_pdf_text("Trainset\SubI_CV_Byron_Beer_1005.pdf"),
+#     ).with_inputs("document_text")
+    
+# ]
