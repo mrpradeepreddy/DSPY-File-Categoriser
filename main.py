@@ -1,4 +1,7 @@
 import dspy
+import streamlit as st
+import pandas as pd
+import json
 from dspy.teleprompt import BootstrapFewShot
 import fitz  #PyMuPDF library
 import os 
@@ -21,36 +24,64 @@ dspy.configure(lm=gemini_model)
 
 # ---  DEFINE SIGNATURES AND MODULE] ---
 
-medical_fields = ["Cardiology", "Neurology", "Oncology", "Pediatrics", "Dermatology"]
 
-class CategorizeMedicalDoc(dspy.Signature):
-    """Categorizes the text from a medical document into a specific medical field."""
+
+class ExtractMedicalMetadata(dspy.Signature):
+    """Extract structured metadata fields from a medical document."""
     document_text = dspy.InputField(desc="The content of the medical PDF.")
-    medical_field = dspy.OutputField(desc=f"Choose from: {', '.join(medical_fields)}")
+
+    Classification = dspy.OutputField(desc="The classification of the document")
+    DocumentDate = dspy.OutputField(desc="The date the document was created or signed")
+    LabName = dspy.OutputField(desc="The laboratory or facility name")
+    ExpirationDate = dspy.OutputField(desc="The expiration date, if available")
+    ClassificationReason = dspy.OutputField(desc="The reason for classification")
+    PersonnelName = dspy.OutputField(desc="The name of the personnel mentioned")
+    OrganizationName = dspy.OutputField(desc="The name of the organization involved")
+    StudyName = dspy.OutputField(desc="The study name related to the document")
+    Country = dspy.OutputField(desc="The country where the study or lab is located")
+    SiteNumber = dspy.OutputField(desc="The site number, if available")
 
 class MedicalQASystem(dspy.Module):
     def __init__(self):
         super().__init__()
-        self.categorizer = dspy.ChainOfThought(CategorizeMedicalDoc)
+        self.extracter = dspy.ChainOfThought(ExtractMedicalMetadata)
 
     def forward(self, document_text):
-        category_prediction = self.categorizer(document_text=document_text)
+        metadata = self.extracter(document_text=document_text)
         return dspy.Prediction(
-            medical_field=category_prediction.medical_field,
+            Classification=metadata.Classification,
+            DocumentDate=metadata.DocumentDate,
+            LabName=metadata.LabName,
+            ExpirationDate=metadata.ExpirationDate,
+            ClassificationReason=metadata.ClassificationReason,
+            PersonnelName=metadata.PersonnelName,
+            OrganizationName=metadata.OrganizationName,
+            StudyName=metadata.StudyName,
+            Country=metadata.Country,
+            SiteNumber=metadata.SiteNumber,
         )
+
 
 # This step fine-tunes the prompts for your program.
 qa_program = MedicalQASystem()
 def simple_accuracy(gold, pred,trace=None):
-    return 1.0 if gold.medical_field == pred.medical_field else 0.0
+
+    correct = sum(getattr(gold, f) == getattr(pred, f)
+        for f in [
+            "Classification","DocumentDate","LabName","ExpirationDate",
+            "ClassificationReason","PersonnelName","OrganizationName",
+            "StudyName","Country","SiteNumber"
+        ]
+    )
+    return correct / 10.0
 teleprompter = BootstrapFewShot(metric=simple_accuracy, max_bootstrapped_demos=2, max_labeled_demos=2)
 optimized_qa_program = teleprompter.compile(student=qa_program, trainset=train_data)
 
 
 # ---  USE THE FINE-TUNED MODEL WITH A PDF ---
 
-#  Define PDF Path and your question
-pdf_file_path = "Testset\onco_test_1.pdf"  # Make sure this file exists in your folder!
+# #  Define PDF Path and your question
+pdf_file_path = "Trainset\SubI_CV_Byron_Beer_1005.pdf"  # Make sure this file exists in your folder!
 user_question = "What medication was prescribed to the patient?"
 
 
@@ -58,12 +89,25 @@ user_question = "What medication was prescribed to the patient?"
 document_content = parse_pdf_text(pdf_file_path)
 
 if document_content:
-    # 3. Run the optimized program with the extracted text
-    prediction = optimized_qa_program(document_text=document_content)
 
-    print(f"Analyzing Document: '{pdf_file_path}'")
-    print("--- Model Output ---")
-    print(f"Predicted Medical Field: {prediction.medical_field}")
+# Assume `prediction` is a dspy.Prediction
+    prediction= optimized_qa_program(document_text=document_content)
+    result_dict = {
+        "Classification": prediction.Classification,
+        "DocumentDate": prediction.DocumentDate,
+        "LabName": prediction.LabName,
+        "ExpirationDate": prediction.ExpirationDate,
+        "ClassificationReason": prediction.ClassificationReason,
+        "PersonnelName": prediction.PersonnelName,
+        "OrganizationName": prediction.OrganizationName,
+        "StudyName": prediction.StudyName,
+        "Country": prediction.Country,
+        "SiteNumber": prediction.SiteNumber,
+    }
+
+    # Save to JSON file
+    with open("output.json", "w", encoding="utf-8") as f:
+        json.dump(result_dict, f, indent=4, ensure_ascii=False)
 
     # Inspect the last prompt sent to the Gemini model
     gemini_model.inspect_history(n=1)
