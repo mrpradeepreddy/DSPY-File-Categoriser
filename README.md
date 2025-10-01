@@ -21,8 +21,10 @@ This project provides a **Medical PDF Question-Answering (QA) system** that:
 
 1. Clone the repository:
 ```bash
+
 git clone <repository_url>
 cd <repository_folder>
+
 ````
 
 2. Install dependencies:
@@ -43,42 +45,44 @@ GEMINI_API_KEY="your_api_key_here"
 
 ## Usage
 
-1. Place your PDF file in the project folder (e.g., `abc (3).pdf`).
-2. Update the `pdf_file_path` and `user_question` variables in your script:
+1. Place your PDF file in the project folder (e.g., `abc (3).pdf`) in the Training data
 
-```python
-pdf_file_path = "abc (3).pdf"
-user_question = "What medication was prescribed to the patient?"
-```
-
-3. Run the script:
+2. Run the script:
 
 ```bash
 streamlit run main.py
 ```
 
-4. Output example:
-
-```
-Analyzing Document: 'abc (3).pdf'
-Question: What medication was prescribed to the patient?
-
---- Model Output ---
-Predicted Medical Field: Cardiology
-Answer: Beta-blockers and anticoagulants.
-```
-
+3. Output example:
+"""
+{
+"Classification":"Principal Investigator Curriculum Vitae"
+"DocumentDate":"04-29-2022"
+"LabName":"ABC"
+"ExpirationDate":"05-30-2025"
+"ClassificationReason":"The document contains information about the education, professional experience, and clinical trial experience of a principal investigator."
+"PersonnelName":"Carl Kuvalis"
+"OrganizationName":"Syneos Health, New Chloe Memorial Medical Center, South Buckbury Memorial Hospital, San Jose Medical Center, Harvard Medical School, MIT"
+"StudyName":"Alzheimer's, Parkinson's"
+"Country":"USA"
+"SiteNumber":"1007"
+"Type":"Oncology"
+"Subtype":"N/A"
+}
+"""
 ---
 
 ## Project Structure
 
 ```
-.
+
 ├── main.py               # Main script to run PDF QA
-├── requirements.txt      # Python dependencies
+├── requirements.txt      # Python dependencies 
+├── training_data.py      # To train the model on files
+├── file_extract.py       # To extract the file like the pdf,docx,....
+├── README.md             # ReadME File
 ├── .env                  # Environment variables (API keys)
-├── README.md             # This documentation
-└── abc (3).pdf           # Sample PDF (replace with your own)
+
 ```
 
 ---
@@ -87,9 +91,8 @@ Answer: Beta-blockers and anticoagulants.
 
 1. **Parse PDF:** `parse_pdf_text()` extracts all text from the PDF.
 2. **Categorize:** `CategorizeMedicalDoc` predicts the medical field.
-3. **Answer Questions:** `AnswerFromDocument` answers questions based on PDF content.
-4. **Module Chaining:** `MedicalQASystem` chains categorization and QA.
-5. **Few-Shot Prompt Optimization:** `BootstrapFewShot` improves accuracy using example data.
+3. **Module Chaining:** `MedicalQASystem` chains categorization and QA.
+4. **Few-Shot Prompt Optimization:** `BootstrapFewShot` improves accuracy using example data.
 
 ---
 
@@ -103,10 +106,23 @@ Answer: Beta-blockers and anticoagulants.
 
 ## Requirements
 
-* Python 3.9+
+* `Python 3.9+`
 * `dspy`
 * `PyMuPDF (fitz)`
-* Google Gemini API access
+* `Streamlit`
+* `Google Gemini API access`
+* `google-generativeai` 
+* `python-dotenv `
+* `pdfplumber `
+* `pypdf2`
+* `dspy `
+* `PyMuPDF`
+* `python-docx`
+* `pandas`
+* `openpyxl`
+* `xlrd`
+* `python-pptx`
+* `odfpy`
+* `pypandoc`
+* `pytesseract`
 
-Do you want me to add that?
-```

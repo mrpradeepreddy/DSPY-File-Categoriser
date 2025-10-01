@@ -20,6 +20,7 @@ for path in pdf_paths:
 
 
 
+#---Other way to write the above code--#
 
 # import dspy
 # from file_extract import parse_pdf_text
