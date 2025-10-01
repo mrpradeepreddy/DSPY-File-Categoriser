@@ -54,7 +54,7 @@ user_question = "What medication was prescribed to the patient?"
 3. Run the script:
 
 ```bash
-python main.py
+streamlit run main.py
 ```
 
 4. Output example:

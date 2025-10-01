@@ -4,8 +4,11 @@ import os
 
 # List of your PDF paths
 pdf_paths = [
-    r"Trainset\SubI_CV_Ian_Miller_1007.pdf",
-    r"Trainset\SubI_CV_Byron_Beer_1005.pdf"
+    r"Trainset/1007/PI_CV_Peter_Labadie_1007.pdf",
+    r"Trainset/1007\SubI_CV_Ian_Miller_1007.pdf",
+    r"Trainset/1007/Training_Log_04-Jun-2025_Site_1007.pdf",
+    r"Trainset/1007/Training_Log_05-Jun-2025_Site_1007.pdf",
+    r"Trainset/1007/Training_Protocol_Training_Summary_1007.pdf"
 ]
 
 # Build train_data with a loop

@@ -29,16 +29,18 @@ class ExtractMedicalMetadata(dspy.Signature):
     """Extract structured metadata fields from a medical document."""
     document_text = dspy.InputField(desc="The content of the medical PDF.")
 
-    Classification = dspy.OutputField(desc="The classification of the document")
-    DocumentDate = dspy.OutputField(desc="The date the document was created or signed")
-    LabName = dspy.OutputField(desc="The laboratory or facility name")
-    ExpirationDate = dspy.OutputField(desc="The expiration date, if available")
+    Classification = dspy.OutputField(desc="The classification of the document like Principal Investigator Curriculum Vitae ,Sub-Investigator Curriculum Vitae ,Site Training Material ,Site Evidence of Training ,N/A")
+    DocumentDate = dspy.OutputField(desc="The date the document was created or signed like mm-dd-yyyy") 
+    LabName = dspy.OutputField(desc="Extract the name of the laboratory associated with the site as specified in the document. Note that the extracted lab name is distinct from the site name. Display the extracted lab name as Lab Name in the output. If no lab name is mentioned or identifiable, leave the field blank.")
+    ExpirationDate = dspy.OutputField(desc="The expiration date, if available like mm-dd-yyyy")
     ClassificationReason = dspy.OutputField(desc="The reason for classification")
     PersonnelName = dspy.OutputField(desc="The name of the personnel mentioned")
     OrganizationName = dspy.OutputField(desc="The name of the organization involved")
     StudyName = dspy.OutputField(desc="The study name related to the document")
-    Country = dspy.OutputField(desc="The country where the study or lab is located")
+    Country = dspy.OutputField(desc="The country where the study or lab is located like United States,Canada,India,N/A")
     SiteNumber = dspy.OutputField(desc="The site number, if available")
+    Type=dspy.OutputField(desc="The type of document like Site Management,N/A")
+    Subtype=dspy.OutputField(desc="The subtype of document like Site Set-up,Site Initiation,General,Site Selection,Site Management,N/A")
 
 class MedicalQASystem(dspy.Module):
     def __init__(self):
@@ -58,6 +60,8 @@ class MedicalQASystem(dspy.Module):
             StudyName=metadata.StudyName,
             Country=metadata.Country,
             SiteNumber=metadata.SiteNumber,
+            Type=metadata.Type,
+            Subtype=metadata.Subtype
         )
 
 
@@ -68,7 +72,7 @@ def simple_accuracy(gold, pred,trace=None):
         for f in [
             "Classification","DocumentDate","LabName","ExpirationDate",
             "ClassificationReason","PersonnelName","OrganizationName",
-            "StudyName","Country","SiteNumber"
+            "StudyName","Country","SiteNumber","Type","Subtype"
         ]
     )
     return correct / 10.0
@@ -76,17 +80,19 @@ def simple_accuracy(gold, pred,trace=None):
 teleprompter = BootstrapFewShot(metric=simple_accuracy, max_bootstrapped_demos=2, max_labeled_demos=2)
 optimized_qa_program = teleprompter.compile(student=qa_program, trainset=train_data)
 
-
 # --- STREAMLIT UI ---
 st.title("📑 Medical Document Metadata Extractor")
 
-uploaded_file = st.file_uploader("Upload a medical PDF", type=["pdf"])
+uploaded_file = st.file_uploader("Upload a medical PDF", type=["pdf", "docx", "odt", "txt", "rtf", "xlsx", "csv", "pptx"])
 
 if uploaded_file is not None:
-    with open("uploaded_file.pdf", "wb") as f:
+    file_name = uploaded_file.name
+    file_path = os.path.join("temp_files", file_name)
+    os.makedirs("temp_files", exist_ok=True)
+    with open(file_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    document_content = parse_pdf_text("uploaded_file.pdf")
+    document_content = parse_pdf_text(file_path)
 
     if document_content:
         prediction = optimized_qa_program(document_text=document_content)
@@ -102,6 +108,8 @@ if uploaded_file is not None:
             "StudyName": prediction.StudyName,
             "Country": prediction.Country,
             "SiteNumber": prediction.SiteNumber,
+            "Type": prediction.Type,
+            "Subtype": prediction.Subtype
         }
 
         st.subheader("Extracted Metadata")

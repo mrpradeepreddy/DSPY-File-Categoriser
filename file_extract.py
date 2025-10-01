@@ -7,6 +7,8 @@ from odf import text, teletype
 import pytesseract               # OCR for images
 from PIL import Image
 from odf.opendocument import load
+import pypandoc
+
 
 def parse_pdf_text(file_path: str) -> str:
     """
@@ -39,7 +41,6 @@ def parse_pdf_text(file_path: str) -> str:
         return "\n".join(teletype.extractText(p) for p in allparas)
 
     elif ext == '.rtf':
-        import pypandoc
         return pypandoc.convert_text(open(file_path, encoding='utf-8').read(),'plain', format='rtf', extra_args=['--standalone'])
 
     # --- Spreadsheet files ---
